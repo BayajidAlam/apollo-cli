@@ -1,11 +1,11 @@
 {
     "name": "apollo-cli",
     "version": "1.0.0",
-    "description": "CLI tool for Apollo Gears backend projects",
+    "description": "CLI tool for speed up backend projects",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "bin": {
-        "apollo-gears": "./bin/index.js"
+        "apollo-cli": "./bin/index.js"
     },
     "scripts": {
         "start": "ts-node src/index.ts",
@@ -20,7 +20,10 @@
         "postgres",
         "typescript"
     ],
-    "author": "",
+    "author": "Bayajid Alam Joyel",
+    "repository": {
+        "url": "https://github.com/BayajidAlam/apollo-cli"
+    },
     "license": "ISC",
     "dependencies": {
         "chalk": "^5.3.0",
