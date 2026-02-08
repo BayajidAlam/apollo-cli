@@ -1,0 +1,40 @@
+{
+    "name": "apollo-cli",
+    "version": "1.0.0",
+    "description": "CLI tool for Apollo Gears backend projects",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "bin": {
+        "apollo-gears": "./bin/index.js"
+    },
+    "scripts": {
+        "start": "ts-node src/index.ts",
+        "build": "tsc",
+        "watch": "tsc -w",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "cli",
+        "express",
+        "prisma",
+        "postgres",
+        "typescript"
+    ],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "chalk": "^5.3.0",
+        "commander": "^13.1.0",
+        "ejs": "^3.1.10",
+        "fs-extra": "^11.3.0",
+        "inquirer": "^12.4.2"
+    },
+    "devDependencies": {
+        "@types/ejs": "^3.1.5",
+        "@types/fs-extra": "^11.0.4",
+        "@types/inquirer": "^9.0.7",
+        "@types/node": "^22.13.1",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.7.3"
+    }
+}
