@@ -7,8 +7,14 @@ import { initCommand } from '../commands/init';
 
 const program = new Command();
 
+import fs from 'fs';
+import path from 'path';
+
+const packageJsonPath = path.join(__dirname, '../../package.json');
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+
 program
-    .version('1.0.0')
+    .version(packageJson.version)
     .description('Apollo CLI Tool');
 
 program.addCommand(generateCommand);

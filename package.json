@@ -23,7 +23,7 @@
     ],
     "author": "Bayajid Alam Joyel",
     "repository": {
-        "url": "https://github.com/BayajidAlam/apollo-cli"
+        "url": "git+https://github.com/BayajidAlam/apollo-cli.git"
     },
     "license": "ISC",
     "publishConfig": {
