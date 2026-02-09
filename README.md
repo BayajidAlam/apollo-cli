@@ -21,17 +21,19 @@ apollo-cli init my-new-project
 ```
 
 During init, the CLI:
-- Fetches the latest versions of all dependencies from npm
-- Creates a `prisma/schema.prisma` file and `prisma` folder
-- Lets you choose npm, yarn, or pnpm for installation
+
+- **Latest Dependencies**: Fetches the latest versions of all packages from npm.
+- **Database Setup**: Configures Prisma with PostgreSQL adapter (`@prisma/adapter-pg`) for optimized connection pooling.
+- **Strict TypeScript**: Generates a strict `tsconfig.json` for type safety.
+- **Structure**: Creates a modular `src` folder structure with `modules`, `middlewares`, `routes`, `utils`, `errors`, `config`, and `lib`.
 
 ### 2. Generate Modules
 
 Scaffold a new module (Controller, Service, Route, Interface, Validation, Constants) instantly.
 
-**Alias**: `g`
+**Alias**:
 
-**Important:** You must run this command *inside* your project directory.
+**Important:** You must run this command _inside_ your project directory.
 
 ```bash
 cd my-new-project
@@ -42,13 +44,16 @@ apollo-cli generate module User
 apollo-cli g module User
 ```
 
-This will create `src/app/modules/User` with:
+This will create `src/modules/User` with:
+
 - `user.controller.ts`: Request handlers
 - `user.service.ts`: Business logic
 - `user.route.ts`: Express routes
 - `user.interface.ts`: TypeScript interfaces
 - `user.validation.ts`: Zod validation schemas
 - `user.constant.ts`: Module constants
+
+The module will be automatically placed in `src/modules/User` (capitalized).
 
 ### 3. Build for Production
 

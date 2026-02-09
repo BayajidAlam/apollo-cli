@@ -1,47 +1,53 @@
 {
-    "name": "@bayajidalam/apollo-cli",
-    "version": "1.0.3",
-    "description": "CLI tool for speed up backend projects",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "bin": {
-        "apollo-cli": "dist/bin/index.js"
-    },
-    "scripts": {
-        "start": "ts-node src/index.ts",
-        "build": "tsc",
-        "watch": "tsc -w",
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "cli": "ts-node src/bin/index.ts"
-    },
-    "keywords": [
-        "cli",
-        "express",
-        "prisma",
-        "postgres",
-        "typescript"
-    ],
-    "author": "Bayajid Alam Joyel",
-    "repository": {
-        "url": "git+https://github.com/BayajidAlam/apollo-cli.git"
-    },
-    "license": "ISC",
-    "publishConfig": {
-        "access": "public"
-    },
-    "dependencies": {
-        "chalk": "^4.1.2",
-        "commander": "^13.1.0",
-        "ejs": "^3.1.10",
-        "fs-extra": "^11.3.0",
-        "inquirer": "^8.2.6"
-    },
-    "devDependencies": {
-        "@types/ejs": "^3.1.5",
-        "@types/fs-extra": "^11.0.4",
-        "@types/inquirer": "^8.2.6",
-        "@types/node": "^22.13.1",
-        "ts-node": "^10.9.2",
-        "typescript": "^5.7.3"
-    }
+  "name": "@bayajidalam/apollo-cli",
+  "version": "1.0.3",
+  "description": "CLI tool for speed up backend projects",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "apollo-cli": "dist/bin/index.js"
+  },
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "cli": "ts-node src/bin/index.ts",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "cli",
+    "express",
+    "prisma",
+    "postgres",
+    "typescript"
+  ],
+  "author": "Bayajid Alam Joyel",
+  "repository": {
+    "url": "git+https://github.com/BayajidAlam/apollo-cli.git"
+  },
+  "license": "ISC",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^13.1.0",
+    "ejs": "^3.1.10",
+    "figlet": "^1.10.0",
+    "fs-extra": "^11.3.0",
+    "inquirer": "^8.2.6"
+  },
+  "devDependencies": {
+    "@types/ejs": "^3.1.5",
+    "@types/figlet": "^1.7.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^8.2.6",
+    "@types/node": "^22.13.1",
+    "prettier": "^3.8.1",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "prettier-plugin-sort-json": "^4.2.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
 }
