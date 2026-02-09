@@ -5,6 +5,65 @@ import path from 'path';
 import chalk from 'chalk';
 import { execSync } from 'child_process';
 
+// Helper function to get the latest version of a package from npm
+async function getLatestVersion(packageName: string): Promise<string> {
+    try {
+        const version = execSync(`npm view ${packageName} version`, {
+            encoding: 'utf-8',
+            stdio: ['pipe', 'pipe', 'pipe']
+        }).trim();
+        return `^${version}`;
+    } catch (error) {
+        console.warn(chalk.yellow(`⚠️  Could not fetch latest version for ${packageName}, using fallback`));
+        return 'latest';
+    }
+}
+
+// Fetch latest versions for all dependencies
+async function getLatestDependencies() {
+    console.log(chalk.blue('📦 Fetching latest package versions...'));
+
+    const deps = ['express', 'cors', 'dotenv', 'http-status', '@prisma/client'];
+    const devDeps = ['typescript', 'ts-node-dev', '@types/node', '@types/express', '@types/cors', 'prisma', 'eslint', 'prettier'];
+
+    const [dependencies, devDependencies] = await Promise.all([
+        Promise.all(deps.map(async (dep) => [dep, await getLatestVersion(dep)])),
+        Promise.all(devDeps.map(async (dep) => [dep, await getLatestVersion(dep)]))
+    ]);
+
+    return {
+        dependencies: Object.fromEntries(dependencies),
+        devDependencies: Object.fromEntries(devDependencies)
+    };
+}
+
+// Detect available package managers
+function detectPackageManagers(): { available: string[], all: string[] } {
+    const all = ['npm', 'pnpm', 'yarn'];
+    const available: string[] = [];
+    
+    all.forEach(pm => {
+        try {
+            execSync(`${pm} --version`, { stdio: 'ignore' });
+            available.push(pm);
+        } catch {
+            // Package manager not available
+        }
+    });
+    
+    return { available, all };
+}
+
+// Check if a package manager is installed
+function isPackageManagerInstalled(pm: string): boolean {
+    try {
+        execSync(`${pm} --version`, { stdio: 'ignore' });
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 export const initCommand = new Command('init')
     .description('Initialize a new Apollo Gears project')
     .argument('[projectName]', 'Name of the project directory')
@@ -36,7 +95,10 @@ export const initCommand = new Command('init')
             // 2. Create Directory
             await fs.ensureDir(projectRoot);
 
-            // 3. Create Package.json
+            // 3. Fetch latest versions
+            const { dependencies, devDependencies } = await getLatestDependencies();
+
+            // 4. Create Package.json
             const packageJson = {
                 name: projectName,
                 version: "1.0.0",
@@ -53,27 +115,12 @@ export const initCommand = new Command('init')
                 keywords: ["express", "prisma", "typescript", "apollo-gears"],
                 author: "",
                 license: "ISC",
-                dependencies: {
-                    "express": "^4.18.2",
-                    "cors": "^2.8.5",
-                    "dotenv": "^16.3.1",
-                    "http-status": "^1.7.3",
-                    "@prisma/client": "^5.7.1"
-                },
-                devDependencies: {
-                    "typescript": "^5.3.3",
-                    "ts-node-dev": "^2.0.0",
-                    "@types/node": "^20.10.4",
-                    "@types/express": "^4.17.21",
-                    "@types/cors": "^2.8.17",
-                    "prisma": "^5.7.1",
-                    "eslint": "^8.55.0",
-                    "prettier": "^3.1.1"
-                }
+                dependencies,
+                devDependencies
             };
             await fs.writeJson(path.join(projectRoot, 'package.json'), packageJson, { spaces: 2 });
 
-            // 4. Create tsconfig.json
+            // 5. Create tsconfig.json
             const tsconfig = {
                 "compilerOptions": {
                     "target": "ES2021",
@@ -91,20 +138,21 @@ export const initCommand = new Command('init')
             };
             await fs.writeJson(path.join(projectRoot, 'tsconfig.json'), tsconfig, { spaces: 2 });
 
-            // 5. Create Scaffolding Folders
+            // 6. Create Scaffolding Folders
             const folders = [
                 'src/app/modules',
                 'src/app/middlewares',
                 'src/app/routes',
                 'src/app/utils',
                 'src/app/errors',
-                'src/app/config'
+                'src/app/config',
+                'prisma'
             ];
             for (const folder of folders) {
                 await fs.ensureDir(path.join(projectRoot, folder));
             }
 
-            // 6. Create Essential Files
+            // 7. Create Essential Files
             // src/server.ts
             const serverContent = `import app from './app';
 import config from './app/config';
@@ -154,10 +202,29 @@ export default {
 };`;
             await fs.writeFile(path.join(projectRoot, 'src/app/config/index.ts'), configContent);
 
-            // .env
-            const envContent = `PORT=5000
+                        // .env
+                        const envContent = `PORT=5000
 DATABASE_URL="postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public"`;
-            await fs.writeFile(path.join(projectRoot, '.env'), envContent);
+                        await fs.writeFile(path.join(projectRoot, '.env'), envContent);
+
+                        // prisma/schema.prisma
+                        const prismaSchemaContent = `generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id        String   @id @default(uuid())
+    email     String   @unique
+    name      String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}`;
+                        await fs.writeFile(path.join(projectRoot, 'prisma/schema.prisma'), prismaSchemaContent);
 
             // .gitignore
             const gitignoreContent = `node_modules
@@ -167,8 +234,22 @@ dist
 
             console.log(chalk.green('\n✅ Project structure created successfully!'));
 
-            // 7. Install Dependencies Prompt
-            const { install } = await inquirer.prompt([
+            // 8. Package Manager & Install Dependencies Prompt
+            const { available, all } = detectPackageManagers();
+            
+            const pmChoices = all.map(pm => ({
+                name: available.includes(pm) ? `${pm} ✓` : `${pm} (not installed)`,
+                value: pm
+            }));
+
+            const answers = await inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'packageManager',
+                    message: 'Which package manager would you like to use?',
+                    choices: pmChoices,
+                    default: available[0] || 'npm'
+                },
                 {
                     type: 'confirm',
                     name: 'install',
@@ -177,14 +258,36 @@ dist
                 }
             ]);
 
-            if (install) {
-                console.log(chalk.yellow('\n📦 Installing dependencies...'));
-                execSync('npm install', { cwd: projectRoot, stdio: 'inherit' });
+            const packageManager = answers.packageManager;
+            const { install } = answers;
+
+            // Check if selected package manager is installed
+            if (install && !isPackageManagerInstalled(packageManager)) {
+                console.log(chalk.yellow(`\n⚠️  ${packageManager} is not installed on your system.`));
+                console.log(chalk.cyan(`Install it with: npm install -g ${packageManager}`));
+                console.log(chalk.cyan(`Falling back to npm...\n`));
+                
+                const installCmd = 'npm install';
+                execSync(installCmd, { cwd: projectRoot, stdio: 'inherit' });
                 console.log(chalk.green('\n✅ Dependencies installed!'));
+                
+                const devCmd = 'npm run dev';
+                console.log(chalk.cyan(`\nTo get started:\n  cd ${projectName}\n  ${devCmd}\n`));
+            } else if (install) {
+                console.log(chalk.yellow(`\n📦 Installing dependencies with ${packageManager}...`));
+                const installCmd = packageManager === 'yarn' ? 'yarn' : `${packageManager} install`;
+                execSync(installCmd, { cwd: projectRoot, stdio: 'inherit' });
+                console.log(chalk.green('\n✅ Dependencies installed!'));
+                
+                const devCmd = packageManager === 'npm' ? 'npm run dev' : 
+                              packageManager === 'yarn' ? 'yarn dev' : 'pnpm dev';
+                console.log(chalk.cyan(`\nTo get started:\n  cd ${projectName}\n  ${devCmd}\n`));
+            } else {
+                const devCmd = packageManager === 'npm' ? 'npm run dev' : 
+                              packageManager === 'yarn' ? 'yarn dev' : 'pnpm dev';
+                const installCmd = packageManager === 'yarn' ? 'yarn' : `${packageManager} install`;
+                console.log(chalk.cyan(`\nTo get started:\n  cd ${projectName}\n  ${installCmd} && ${devCmd}\n`));
             }
-
-            console.log(chalk.cyan(`\nTo get started:\n  cd ${projectName}\n  ${install ? 'npm run dev' : 'npm install && npm run dev'}\n`));
-
         } catch (error) {
             console.error(chalk.red('❌ Initialization failed:'), error);
             process.exit(1);

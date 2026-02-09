@@ -20,6 +20,11 @@ Create a complete backend project structure with Express, Prisma, and TypeScript
 apollo-cli init my-new-project
 ```
 
+During init, the CLI:
+- Fetches the latest versions of all dependencies from npm
+- Creates a `prisma/schema.prisma` file and `prisma` folder
+- Lets you choose npm, yarn, or pnpm for installation
+
 ### 2. Generate Modules
 
 Scaffold a new module (Controller, Service, Route, Interface, Validation, Constants) instantly.
