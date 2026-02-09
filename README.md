@@ -1,97 +1,70 @@
 # Apollo Gears CLI
 
-A CLI tool for scaffolding and managing Apollo Gears backend projects (Express + TypeScript + Prisma + PostgreSQL).
+A powerful CLI tool for scaffolding and managing **Apollo Gears** backend projects (Express + TypeScript + Prisma + PostgreSQL).
 
 ## Installation
 
-### Global Installation
-
-To install the CLI globally:
+Install the CLI globally via npm:
 
 ```bash
-npm install -g apollo-cli
+npm install -g @bayajidalam/apollo-cli
 ```
-
-### Local Development Setup
-
-If you are developing this tool locally and want to test it:
-
-1.  **Build the CLI**:
-    ```bash
-    npm run build
-    ```
-
-2.  **Link it globally**:
-    ```bash
-    npm link
-    ```
-    This makes the `apollo-cli` command available in your terminal.
 
 ## Usage
 
-### 1. `generate` (alias: `g`)
+### 1. Initialize a New Project
 
-Generates a new module structure including controller, service, route, interface, validation, and constants.
+Create a complete backend project structure with Express, Prisma, and TypeScript configured.
 
-**Syntax:**
 ```bash
-apollo-cli generate module <ModuleName>
-# OR
-apollo-cli g module <ModuleName>
+apollo-cli init my-new-project
 ```
 
-**Example:**
-Generate a `User` module:
+### 2. Generate Modules
+
+Scaffold a new module (Controller, Service, Route, Interface, Validation, Constants) instantly.
+
+**Alias**: `g`
+
+**Important:** You must run this command *inside* your project directory.
+
 ```bash
+cd my-new-project
+# Using full command
+apollo-cli generate module User
+
+# Using alias
 apollo-cli g module User
 ```
 
-This will create the following files in `src/app/modules/User`:
-- `user.controller.ts`
-- `user.service.ts`
-- `user.route.ts`
-- `user.interface.ts`
-- `user.validation.ts`
-- `user.constant.ts`
+This will create `src/app/modules/User` with:
+- `user.controller.ts`: Request handlers
+- `user.service.ts`: Business logic
+- `user.route.ts`: Express routes
+- `user.interface.ts`: TypeScript interfaces
+- `user.validation.ts`: Zod validation schemas
+- `user.constant.ts`: Module constants
 
-### 2. `build`
+### 3. Build for Production
 
-Builds the application for production deployment.
+Builds your TypeScript application to the `dist` folder.
 
-**Syntax:**
 ```bash
 apollo-cli build
 ```
 
-**What it does:**
-- Cleans the `dist` folder.
-- Compiles TypeScript files.
-- Copies `package.json`, `package-lock.json`, and `.env` to the `dist` folder.
+### 4. Prisma Utilities
 
-### 3. `prisma`
+Convenient wrappers for common Prisma commands.
 
-Helper commands for Prisma ORM.
-
-**Generate Client:**
 ```bash
+# Generate Prisma Client (runs: npx prisma generate)
 apollo-cli prisma generate
-```
-*(Runs `npx prisma generate`)*
 
-**Run Migrations:**
-```bash
+# Run Migrations (runs: npx prisma migrate dev)
 apollo-cli prisma migrate
 ```
-*(Runs `npx prisma migrate dev`)*
 
-## Development
+## License
 
-To run the CLI directly from source without building:
-
-```bash
-npx ts-node src/bin/index.ts <command>
-```
-Example:
-```bash
-npx ts-node src/bin/index.ts generate module Product
-```
+ISC

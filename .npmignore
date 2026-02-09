@@ -1,0 +1,13 @@
+src/
+node_modules/
+.env
+tsconfig.json
+.git/
+.gitignore
+my-project/
+my-new-project/
+USAGE.md
+implementation_plan.md
+walkthrough.md
+implementation_plan_init.md
+walkthrough_init.md
